@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,38 @@ namespace TodoTaskApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-        }
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                config =>
+                {
+                    config.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                });
+            });
+
+            services.AddSwaggerGen(options =>
+            {
+                var titleBase = "BACKEND APLICAÇÃO TODO TASK";
+                var description = $"Utilizada para teste de aplicativo feito no IONIC";
+                var contact = new OpenApiContact()
+                {
+                    Email = "marcio.nizzola@etec.sp.gov.br",
+                    Name = "Etec Itu",
+                    Url = new System.Uri("http://www.etecitu.com.br")
+                };
+
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = titleBase,
+                    Description = description,
+                    Contact = contact
+                });
+            });
+          }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -40,11 +72,19 @@ namespace TodoTaskApi
 
             app.UseRouting();
 
+            app.UseCors("AllowAllOrigins");
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Primeira Api ");
             });
         }
     }
