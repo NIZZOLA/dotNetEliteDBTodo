@@ -30,15 +30,14 @@ namespace TodoTaskApi
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins",
-                config =>
-                {
-                    config.AllowAnyOrigin()
-                               .AllowAnyMethod()
-                               .AllowAnyHeader();
-                });
+                options.AddPolicy("AllowAllOrigins", config =>
+                     config.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .Build()
+                );
             });
-
+            
             services.AddSwaggerGen(options =>
             {
                 var titleBase = "BACKEND APLICAÇÃO TODO TASK";
@@ -58,7 +57,9 @@ namespace TodoTaskApi
                     Contact = contact
                 });
             });
-          }
+
+            
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -73,7 +74,7 @@ namespace TodoTaskApi
             app.UseRouting();
 
             app.UseCors("AllowAllOrigins");
-
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
